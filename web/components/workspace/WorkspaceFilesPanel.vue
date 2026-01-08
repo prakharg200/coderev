@@ -183,14 +183,39 @@
     </template>
 
     <template #after>
-      <!-- The code editor section -->
-      <WorkspaceCodeEditor
-        :selected-source-file="selectedSourceFile"
-        :editable="isEditable"
-        @edit-source-file="handleEditSourceFile"
-      />
+      <div class="row full-height">
+        <!-- The code editor section -->
+        <div class="col">
+          <WorkspaceCodeEditor
+            :selected-source-file="selectedSourceFile"
+            :editable="isEditable"
+            @edit-source-file="handleEditSourceFile"
+          />
+        </div>
+
+        <!-- AI Chat Panel -->
+        <WorkspaceAiChatPanel
+          v-if="showAiChat"
+          :selected-source-file="selectedSourceFile"
+          :selection="selection"
+          @close="showAiChat = false"
+        />
+      </div>
     </template>
   </QSplitter>
+
+  <!-- AI Chat Toggle Button (floating) -->
+  <QBtn
+    class="ai-chat-fab"
+    :class="{ 'ai-chat-fab--active': showAiChat }"
+    :icon="tabMessageChatbot"
+    :color="showAiChat ? 'primary' : undefined"
+    @click="showAiChat = !showAiChat"
+    round
+    size="lg"
+  >
+    <QTooltip>{{ showAiChat ? 'Close AI Chat' : 'Open AI Chat' }}</QTooltip>
+  </QBtn>
 
   <WorkspaceFileSelectorDialog
     v-model="showFileSelector"
@@ -209,7 +234,7 @@ import {
   tabX,
 } from "quasar-extras-svg-icons/tabler-icons";
 import { FieldValue } from "firebase/firestore";
-import { tabFilePlus } from "quasar-extras-svg-icons/tabler-icons-v2";
+import { tabFilePlus, tabMessageChatbot } from "quasar-extras-svg-icons/tabler-icons-v2";
 import { QInput } from "quasar";
 import { ALLOWED_CODE_FILE_EXTENSIONS } from "../../../shared/constants";
 import { btnProps } from "../../utils/commonProps";
@@ -279,6 +304,9 @@ const { isOverDropZone } = useDropZone(dropZone, handleDrop);
 const { open, onChange } = useFileDialog();
 
 const { showFileSelector } = palette;
+
+// AI Chat panel visibility
+const showAiChat = ref(false);
 
 onBeforeUnmount(() => {
   showFileSelector.value = false;
@@ -760,4 +788,17 @@ function handleFileSelected(fileId: string) {
 .split-container {
   height: 100vh;
 }
+
+.ai-chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ai-chat-fab--active {
+  right: 420px;
+}
 </style>
+

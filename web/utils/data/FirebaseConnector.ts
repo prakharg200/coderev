@@ -71,18 +71,21 @@ class FirebaseConnector {
       import.meta.env.VITE_FIREBASE_SOURCE_STORAGE_BUCKET
     );
 
-    if (
-      import.meta.env.DEV ||
-      window.location.hostname.toLowerCase() === "localhost"
-    ) {
+    const hostname = window.location.hostname.toLowerCase();
+    const isLocalDev = import.meta.env.DEV ||
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]";
+
+    if (isLocalDev) {
       console.log("⮑ Starting application in development mode.");
-      connectAuthEmulator(this.auth, "http://localhost:9099", {
+      connectAuthEmulator(this.auth, "http://127.0.0.1:9099", {
         disableWarnings: true,
       });
-      connectFirestoreEmulator(this.db, "localhost", 8080);
-      connectFunctionsEmulator(this.functions, "localhost", 5001);
-      connectStorageEmulator(this.storage, "localhost", 9199);
-      connectStorageEmulator(this.sourceStorage, "localhost", 9199);
+      connectFirestoreEmulator(this.db, "127.0.0.1", 8081);
+      connectFunctionsEmulator(this.functions, "127.0.0.1", 5001);
+      connectStorageEmulator(this.storage, "127.0.0.1", 9199);
+      connectStorageEmulator(this.sourceStorage, "127.0.0.1", 9199);
     } else {
       this.analytics = getAnalytics(this.app);
     }
@@ -226,12 +229,15 @@ class FirebaseConnector {
     const tempApp = initializeApp(this.firebaseConfig, username);
     const tempAuth = getAuth(tempApp);
 
-    if (
-      import.meta.env.DEV ||
-      window.location.hostname.toLowerCase() === "localhost"
-    ) {
+    const hostname = window.location.hostname.toLowerCase();
+    const isLocalDev = import.meta.env.DEV ||
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]";
+
+    if (isLocalDev) {
       console.log("⮑ Connecting tempAuth to emulator");
-      connectAuthEmulator(tempAuth, "http://localhost:9099", {
+      connectAuthEmulator(tempAuth, "http://127.0.0.1:9099", {
         disableWarnings: true,
       });
     }
@@ -252,29 +258,29 @@ class FirebaseConnector {
    * @param displayName The display name for the user
    * @param currentUserRef The current user reference
    */
-    public async provisionGeneratedAccountViaFn(
-      workspaceUid: string,
-      username: string,
-      password: string,
-      displayName: string,
-      currentUserRef: EmbeddedRef
-    ) : Promise<GenerateAccountResponse> {
-      const response = await httpsCallable<
-        GenerateAccountRequest, GenerateAccountResponse
-      >(this.functions, "generateAccount")({
-        username,
-        label: displayName,
-        password: password,
-        workspaceUid,
-        createdBy: currentUserRef
-      })
+  public async provisionGeneratedAccountViaFn(
+    workspaceUid: string,
+    username: string,
+    password: string,
+    displayName: string,
+    currentUserRef: EmbeddedRef
+  ): Promise<GenerateAccountResponse> {
+    const response = await httpsCallable<
+      GenerateAccountRequest, GenerateAccountResponse
+    >(this.functions, "generateAccount")({
+      username,
+      label: displayName,
+      password: password,
+      workspaceUid,
+      createdBy: currentUserRef
+    })
 
-      if (!response.data.succeeded) {
-        console.error(`Failed to generate account;`, response.data.message)
-      }
-
-      return response.data
+    if (!response.data.succeeded) {
+      console.error(`Failed to generate account;`, response.data.message)
     }
+
+    return response.data
+  }
 
   /**
    * Performs a sign in with the supplied login name and password

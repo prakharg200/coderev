@@ -1,5 +1,6 @@
-import {generateAccount} from "./generateAccount";
-import {firebaseConnector} from "./ServerFirebaseConnector";
+import { generateAccount } from "./generateAccount";
+import { aiChat } from "./aiChat";
+import { firebaseConnector } from "./ServerFirebaseConnector";
 
 console.log("Starting functions...");
 
@@ -7,3 +8,5 @@ console.log("Starting functions...");
 firebaseConnector.start();
 
 exports.generateAccount = generateAccount;
+exports.aiChat = aiChat;
+
