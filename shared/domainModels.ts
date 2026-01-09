@@ -58,6 +58,91 @@ export type Rating = {
 }
 
 /**
+ * Represents a coding problem created by an interviewer.
+ */
+export type CodingProblem = {
+  /**
+   * Unique identifier for this problem
+   */
+  uid: string;
+
+  /**
+   * Title of the problem
+   */
+  title: string;
+
+  /**
+   * Problem description in markdown format
+   */
+  description: string;
+
+  /**
+   * Optional starter code for the problem
+   */
+  starterCode?: string;
+
+  /**
+   * Programming language for the starter code
+   */
+  language?: string;
+
+  /**
+   * When this problem was created
+   */
+  createdUtc: string;
+
+  /**
+   * UID of the user who created this problem
+   */
+  createdBy: string;
+};
+
+/**
+ * Represents a candidate's submission for a coding problem.
+ */
+export type ProblemSubmission = {
+  /**
+   * Unique identifier for this submission
+   */
+  uid: string;
+
+  /**
+   * UID of the problem this submission is for
+   */
+  problemUid: string;
+
+  /**
+   * UID of the candidate who submitted this
+   */
+  candidateUid: string;
+
+  /**
+   * The submitted code
+   */
+  code: string;
+
+  /**
+   * When this was submitted
+   */
+  submittedUtc: string;
+
+  /**
+   * Status of the submission
+   */
+  status: 'pending' | 'reviewed';
+
+  /**
+   * Optional feedback from the interviewer
+   */
+  feedback?: string;
+
+  /**
+   * Rating from 1-5 given by interviewer
+   */
+  rating?: number;
+};
+
+/**
  * Defines a workspace which contains a set of notes.
  */
 export type Workspace = {
@@ -85,6 +170,11 @@ export type Workspace = {
    * candidate UID and there can be an array of ratings.
    */
   ratings?: Record<string, Rating>;
+
+  /**
+   * Coding problems created for this workspace. Key is problem UID.
+   */
+  problems?: Record<string, CodingProblem>;
 } & Entity & Archivable;
 
 /**
@@ -130,6 +220,56 @@ export type ReviewComment = {
 }
 
 /**
+ * Represents an edit made by a candidate to an existing source file.
+ */
+export type CandidateEdit = {
+  /**
+   * UID of the original source file that was edited
+   */
+  originalSourceUid: string;
+
+  /**
+   * The modified text content
+   */
+  modifiedText: string;
+
+  /**
+   * When this edit was last modified
+   */
+  lastModifiedUtc: string;
+};
+
+/**
+ * Represents a new file created by a candidate.
+ */
+export type CandidateNewFile = {
+  /**
+   * UID for this new file
+   */
+  uid: string;
+
+  /**
+   * Name of the file (with extension)
+   */
+  name: string;
+
+  /**
+   * Content of the file
+   */
+  content: string;
+
+  /**
+   * When this file was created
+   */
+  createdUtc: string;
+
+  /**
+   * When this file was last modified
+   */
+  lastModifiedUtc?: string;
+};
+
+/**
  * This document represents a candidate review.  When we create it, we copy over
  * the media refs from the workspace.
  */
@@ -167,4 +307,22 @@ export type CandidateReview = {
    * comment.
    */
   comments: Record<string, ReviewComment>;
+
+  /**
+   * Edits made by the candidate to existing source files.
+   * Key is the source UID.
+   */
+  candidateEdits?: Record<string, CandidateEdit>;
+
+  /**
+   * New files created by the candidate.
+   * Key is the file UID.
+   */
+  candidateNewFiles?: Record<string, CandidateNewFile>;
+
+  /**
+   * Problem submissions by the candidate.
+   * Key is the problem UID.
+   */
+  problemSubmissions?: Record<string, ProblemSubmission>;
 } & Entity & Archivable;

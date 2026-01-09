@@ -57,6 +57,20 @@
               >
                 <QTooltip> Save pending changes </QTooltip>
               </QBtn>
+
+              <!-- Candidate save button -->
+              <QBtn
+                v-show="isReview && candidateHasEdits"
+                class="q-ml-sm"
+                color="positive"
+                :icon="tabDeviceFloppy"
+                :loading="savingCandidateEdits"
+                @click="saveCandidateEdits"
+                unelevated
+                dense
+              >
+                <QTooltip> Save your edits </QTooltip>
+              </QBtn>
             </QToolbar>
           </QHeader>
 
@@ -188,7 +202,7 @@
         <div class="col">
           <WorkspaceCodeEditor
             :selected-source-file="selectedSourceFile"
-            :editable="isEditable"
+            :editable="isEditable || isReview"
             @edit-source-file="handleEditSourceFile"
           />
         </div>
@@ -297,6 +311,12 @@ const unsavedSourceFiles = ref<SourceFile[]>([]);
 // Tracks the modified file UIDs.
 const modifiedFileUids = ref<string[]>([]);
 
+// Tracks candidate edits by file UID.
+const candidateEditedFiles = ref<Record<string, string>>({});
+
+// Saving state for candidate edits
+const savingCandidateEdits = ref(false);
+
 const dropZone = ref();
 
 const { isOverDropZone } = useDropZone(dropZone, handleDrop);
@@ -317,6 +337,11 @@ onBeforeUnmount(() => {
  * TODO: maybe want to allow different candidates to have different files?
  */
 const isEditable = computed(() => !route.fullPath.includes("/c/"));
+
+/**
+ * True if the candidate has unsaved edits.
+ */
+const candidateHasEdits = computed(() => Object.keys(candidateEditedFiles.value).length > 0);
 
 /**
  * In review mode; a candidate is reviewing the code and providing feedback.
@@ -591,7 +616,20 @@ function addSourceFile(name: string, text: string) {
  * saved to unsaved.
  */
 function handleEditSourceFile() {
-  if (!selectedSourceFile.value || !selectedSourceFile.value.ref) {
+  if (!selectedSourceFile.value) {
+    console.log("  ⮑ No source file selected");
+    return;
+  }
+
+  // In review mode, track edits separately for candidates
+  if (isReview.value && selectedSourceFile.value.ref) {
+    const sourceUid = selectedSourceFile.value.ref.uid;
+    candidateEditedFiles.value[sourceUid] = selectedSourceFile.value.text;
+    console.log(`  ⮑ Tracking candidate edit for file: ${sourceUid}`);
+    return;
+  }
+
+  if (!selectedSourceFile.value.ref) {
     console.log("  ⮑ Source file doesn't have a ref");
     return;
   }
@@ -733,6 +771,46 @@ async function saveFiles() {
     warn("Failed to save your changes.");
   } finally {
     saving.value = false;
+  }
+}
+
+/**
+ * Saves candidate file edits to the candidate's review document in Firestore.
+ */
+async function saveCandidateEdits() {
+  if (!candidate.value || Object.keys(candidateEditedFiles.value).length === 0) {
+    return;
+  }
+
+  savingCandidateEdits.value = true;
+
+  try {
+    const updates: Record<string, { originalSourceUid: string; modifiedText: string; lastModifiedUtc: string }> = {};
+
+    for (const [sourceUid, modifiedText] of Object.entries(candidateEditedFiles.value)) {
+      updates[`candidateEdits.${sourceUid}`] = {
+        originalSourceUid: sourceUid,
+        modifiedText: modifiedText,
+        lastModifiedUtc: dayjs().utc().toISOString(),
+      };
+    }
+
+    await candidateReviewRepository.updateFields(candidate.value.uid, updates);
+
+    $q.notify({
+      type: "positive",
+      message: "Your edits have been saved!",
+      timeout: 2000,
+      position: "bottom-right",
+    });
+
+    // Clear the local edits after successful save
+    candidateEditedFiles.value = {};
+  } catch (e) {
+    console.error(e);
+    warn("Failed to save your edits.");
+  } finally {
+    savingCandidateEdits.value = false;
   }
 }
 

@@ -18,7 +18,7 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
 
   const workspaces = ref<Workspace[]>([]);
 
-  const workspace = ref<Workspace>({...defaultWorkspace});
+  const workspace = ref<Workspace>({ ...defaultWorkspace });
 
   const selectedSourceFile = ref<SourceFile>();
 
@@ -30,7 +30,7 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
   function reset() {
     workspacesLoaded.value = false
     workspaces.value = [],
-    workspace.value = {...defaultWorkspace}
+      workspace.value = { ...defaultWorkspace }
   }
 
   /**
@@ -138,7 +138,7 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
     console.log(result)
 
     await workspaceRepository.updateFields(workspace.value.uid, {
-      [`sources.${result.uid}`] : {
+      [`sources.${result.uid}`]: {
         uid: result.uid,
         type: "document",
         path: result.path,
@@ -190,7 +190,7 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
 
     // Delete the files
     for (const file of files) {
-      if  (!file.path) {
+      if (!file.path) {
         continue
       }
 
@@ -218,9 +218,56 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
 
     await workspaceRepository.updateFields(
       workspace.value.uid, {
-        [`sources.${hash}.title`]: newNameWithExt
-      }
+      [`sources.${hash}.title`]: newNameWithExt
+    }
     )
+  }
+
+  /**
+   * Adds or updates a coding problem in the current workspace.
+   * @param problem The problem to add or update
+   */
+  async function addProblem(problem: CodingProblem) {
+    if (!workspace.value) {
+      console.log("No active workspace");
+      return;
+    }
+
+    // Skip next subscription update to prevent overwriting our local change
+    skipNextUpdate = true
+
+    await workspaceRepository.updateFields(workspace.value.uid, {
+      [`problems.${problem.uid}`]: problem,
+    } as any)
+
+    // Update local state
+    if (!workspace.value.problems) {
+      workspace.value.problems = {}
+    }
+    workspace.value.problems[problem.uid] = problem
+  }
+
+  /**
+   * Removes a coding problem from the current workspace.
+   * @param problemUid The UID of the problem to remove
+   */
+  async function removeProblem(problemUid: string) {
+    if (!workspace.value) {
+      console.log("No active workspace");
+      return;
+    }
+
+    // Skip next subscription update to prevent overwriting our local change
+    skipNextUpdate = true
+
+    await workspaceRepository.updateFields(workspace.value.uid, {
+      [`problems.${problemUid}`]: null,
+    } as any)
+
+    // Update local state
+    if (workspace.value.problems && workspace.value.problems[problemUid]) {
+      delete workspace.value.problems[problemUid]
+    }
   }
 
   return {
@@ -233,6 +280,8 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
     removeSource,
     deleteWorkspace,
     updateFileName,
+    addProblem,
+    removeProblem,
     selectedSourceFile,
     reset,
     ...useCandidates(workspace)

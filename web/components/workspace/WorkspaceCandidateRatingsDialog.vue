@@ -247,6 +247,55 @@
         </QItemSection>
       </QItem>
     </QCard>
+
+    <!-- Problem Ratings Section -->
+    <QCard
+      v-if="problemSubmissionsWithRatings.length > 0"
+      class="q-mb-sm"
+      :class="dark ? 'bg-grey-10' : 'bg-grey-2'"
+      bordered
+      flat
+    >
+      <QItem>
+        <QItemSection>
+          <QItemLabel class="text-bold">Problem Submissions</QItemLabel>
+          <QItemLabel caption>Ratings for coding problem solutions</QItemLabel>
+        </QItemSection>
+      </QItem>
+      <QSeparator />
+      <QList dense>
+        <QItem
+          v-for="submission in problemSubmissionsWithRatings"
+          :key="submission.problemUid"
+        >
+          <QItemSection>
+            <QItemLabel>{{ getProblemTitle(submission.problemUid) }}</QItemLabel>
+            <QItemLabel caption>
+              Submitted {{ dayjs(submission.submittedUtc).fromNow() }}
+            </QItemLabel>
+          </QItemSection>
+          <QItemSection side>
+            <div class="row items-center">
+              <QRating
+                :model-value="submission.rating || 0"
+                :max="5"
+                size="sm"
+                color="yellow-8"
+                icon="star_border"
+                icon-selected="star"
+                readonly
+              />
+              <span v-if="submission.rating" class="q-ml-xs text-caption">
+                ({{ submission.rating }}/5)
+              </span>
+              <span v-else class="q-ml-xs text-caption text-grey">
+                Not rated
+              </span>
+            </div>
+          </QItemSection>
+        </QItem>
+      </QList>
+    </QCard>
   </SideDialogShell>
 </template>
 
@@ -338,6 +387,26 @@ const summary = computed(() => {
         : counted.depth.total / counted.depth.count / 5,
   };
 });
+
+// Get workspace for problem titles
+const workspaceStore = useWorkspaceStore();
+const { workspace } = storeToRefs(workspaceStore);
+
+/**
+ * Get all problem submissions from the candidate
+ */
+const problemSubmissionsWithRatings = computed(() => {
+  if (!props.candidate?.problemSubmissions) return []
+  return Object.values(props.candidate.problemSubmissions)
+})
+
+/**
+ * Get the problem title from the workspace
+ */
+function getProblemTitle(problemUid: string): string {
+  const problem = workspace.value?.problems?.[problemUid]
+  return problem?.title || `Problem ${problemUid}`
+}
 </script>
 
 <style scoped></style>

@@ -17,7 +17,7 @@
               />
             </template>
             <template #after>
-              <WorkspaceComments />
+              <WorkspaceRightPanel />
             </template>
           </QSplitter>
         </QPage>
@@ -117,28 +117,6 @@
         <LeftNavBottomButtons />
       </QDrawer>
     </QLayout>
-
-    <!-- AI Chat Toggle Button (floating) - Always visible -->
-    <QBtn
-      class="ai-chat-fab"
-      :class="{ 'ai-chat-fab--active': showAiChat }"
-      :icon="tabMessageChatbot"
-      :color="showAiChat ? 'primary' : undefined"
-      @click="showAiChat = !showAiChat"
-      round
-      size="lg"
-    >
-      <QTooltip>{{ showAiChat ? 'Close AI Chat' : 'Open AI Chat' }}</QTooltip>
-    </QBtn>
-
-    <!-- AI Chat Panel -->
-    <WorkspaceAiChatPanel
-      v-if="showAiChat"
-      :selected-source-file="selectedSourceFile"
-      :selection="selection"
-      class="ai-chat-panel-fixed"
-      @close="showAiChat = false"
-    />
   </div>
 </template>
 
@@ -153,7 +131,6 @@ import {
   tabSun,
   tabUser,
 } from "quasar-extras-svg-icons/tabler-icons";
-import { tabMessageChatbot } from "quasar-extras-svg-icons/tabler-icons-v2";
 import { leftMenuProps } from "../../utils/commonProps";
 import { navigateTo } from "nuxt/app";
 import { defaultCandidate } from "../../stores/composables/candidates";
@@ -173,7 +150,7 @@ const workspaceStore = useWorkspaceStore();
 
 const { dark } = storeToRefs(appStore);
 
-const { candidate, selectedSourceFile, selection } = storeToRefs(workspaceStore);
+const { candidate } = storeToRefs(workspaceStore);
 
 const workspaceName = computed(() => candidate.value.workspaceName);
 
@@ -188,12 +165,12 @@ const mini = ref(true);
 
 const split = ref(75);
 
-// AI Chat panel visibility
-const showAiChat = ref(false);
-
 onBeforeMount(async () => {
   try {
     await workspaceStore.ensureCandidate(route.params.uid as string);
+
+    // Load the workspace to get problems and other workspace data
+    await workspaceStore.ensureWorkspace(candidate.value.workspaceUid);
 
     await workspaceStore.loadCandidates(
       route.params.uid as string,
@@ -229,26 +206,5 @@ function sendFeedback() {
 <style scoped>
 .split-container {
   height: 100vh;
-}
-
-.ai-chat-fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.ai-chat-fab--active {
-  right: 420px;
-}
-
-.ai-chat-panel-fixed {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 400px;
-  height: 100vh;
-  z-index: 999;
 }
 </style>

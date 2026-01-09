@@ -21,6 +21,10 @@
             <QTabPanel name="reviews" class="q-pa-none">
               <WorkspaceReviewsPanel />
             </QTabPanel>
+            <!-- Panel for creating and managing coding problems -->
+            <QTabPanel name="problems" class="q-pa-none">
+              <WorkspaceProblemsPanel />
+            </QTabPanel>
           </QTabPanels>
         </QPage>
       </QPageContainer>
@@ -78,6 +82,21 @@
               >
                 <QTooltip self="center left" anchor="center right">
                   Candidate list
+                </QTooltip>
+              </QBtn>
+              <QBtn
+                class="q-mb-md"
+                :class="{
+                  'bg-grey-8': tab === 'problems' && !route.fullPath.includes('/c/'),
+                }"
+                :icon="tabCode"
+                @click="navigateTab('problems')"
+                size="md"
+                flat
+                dense
+              >
+                <QTooltip self="center left" anchor="center right">
+                  Coding problems
                 </QTooltip>
               </QBtn>
               <template v-if="route.fullPath.includes('/c/')">
@@ -231,6 +250,22 @@
             </QItemSection>
           </QItem>
 
+          <!-- Problems item in left nav -->
+          <QItem
+            v-bind="leftMenuProps"
+            :focused="tab === 'problems' && !route.fullPath.includes('/c/')"
+            @click="navigateTab('problems')"
+            manual-focus
+            clickable
+          >
+            <QItemSection avatar>
+              <QIcon :name="tabCode" />
+            </QItemSection>
+            <QItemSection>
+              <QItemLabel class="text-h6">Problems</QItemLabel>
+            </QItemSection>
+          </QItem>
+
           <!-- Card that show the current candidate -->
           <QCard v-if="route.fullPath.includes('/c/')" class="bg-grey-9">
             <QItem v-if="!editCandidate" v-bind="leftMenuProps">
@@ -315,6 +350,7 @@ import {
   tabUsers,
   tabUserEdit,
   tabCheck,
+  tabCode,
 } from "quasar-extras-svg-icons/tabler-icons-v2";
 import { leftMenuProps } from "../../utils/commonProps";
 import { baseUrl } from "../../utils/environment";
