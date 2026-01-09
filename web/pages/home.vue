@@ -123,62 +123,7 @@
           </QItem>
         </QList>
 
-        <div v-if="showVideo" class="q-mt-lg">
-          <QItem class="q-pr-none">
-            <QSpace />
-            <QBtn
-              v-bind="btnProps"
-              label="Done"
-              color="accent"
-              :icon="tabCheck"
-              @click="showVideo = !showVideo"
-            />
-          </QItem>
-          <video
-            preload="none"
-            controls
-            name="media"
-            class="rounded-borders shadow-2"
-            style="width: 100%"
-            poster="https://storage.googleapis.com/media.coderev.app/code-rev-intro.webp"
-            title="CodeRev.app 3 minute intro."
-          >
-            <source
-              src="https://storage.googleapis.com/media.coderev.app/code-rev-intro-720p-hb-1000.mp4"
-              type="video/mp4"
-            />
-          </video>
-        </div>
 
-        <!-- Feedback banner -->
-        <QBanner class="q-mt-md" :dark="dark" inline-actions rounded>
-          Have feedback, ideas, or ran into an issue?
-          <template #action>
-            <QBtn
-              v-bind="btnProps"
-              color="accent"
-              class="q-mr-xs q-px-sm"
-              :icon="showVideo ? tabCheck : tabPlayerPlay"
-              @click="showVideo = !showVideo"
-              unelevated
-            />
-            <QBtn
-              v-bind="btnProps"
-              label="Feedback"
-              color="accent"
-              :icon="tabBrandGithub"
-              @click="
-                navigateTo('https://github.com/CharlieDigital/coderev/issues', {
-                  external: true,
-                  open: {
-                    target: '_blank',
-                  },
-                })
-              "
-              unelevated
-            />
-          </template>
-        </QBanner>
       </div>
 
       <NewWorkspaceDialog
@@ -198,8 +143,6 @@
 import { navigateTo } from "nuxt/app";
 import { tabPlus } from "quasar-extras-svg-icons/tabler-icons";
 import {
-  tabBrandGithub,
-  tabPlayerPlay,
   tabCheck,
   tabArchive,
   tabArchiveOff,
@@ -214,14 +157,12 @@ definePageMeta({
 });
 
 useHeadSafe({
-  title: "CodeRev.app | Workspaces",
+  title: "CodeCrucible | Workspaces",
 });
 
 const dayjs = useDayjs();
 
 const showNewWorkspaceDialog = ref(false);
-
-const showVideo = ref(false);
 
 const showArchived = useLocalStorage("show-archived-workspaces", false);
 

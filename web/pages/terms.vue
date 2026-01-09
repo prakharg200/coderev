@@ -7,17 +7,17 @@
 
       <h4>Introduction</h4>
 
-      <p>Welcome to CodeRev.app (“Company”, “we”, “our”, “us”)!</p>
+      <p>Welcome to CodeCrucible (“Company”, “we”, “our”, “us”)!</p>
 
       <p>
         These Terms of Service (“Terms”, “Terms of Service”) govern your use of
-        our web pages located at https://coderev.app operated by Charles Chen.
+        our web pages located at https://CodeCrucible operated by Charles Chen.
       </p>
 
       <p>
         Our Privacy Policy also governs your use of our Service and explains how
         we collect, safeguard and disclose information that results from your
-        use of our web pages. Please read it here https://coderev.app/privacy.
+        use of our web pages. Please read it here https://CodeCrucible/privacy.
       </p>
 
       <p>
@@ -74,7 +74,7 @@
       </p>
 
       <p>
-        CodeRev.app staff has the right but not the obligation to monitor and
+        CodeCrucible staff has the right but not the obligation to monitor and
         edit all Content provided by users.
       </p>
 
@@ -220,10 +220,10 @@
       <p>
         Service and its original content (excluding Content provided by users),
         features and functionality are and will remain the exclusive property of
-        CodeRev.app and its licensors. Service is protected by copyright,
+        CodeCrucible and its licensors. Service is protected by copyright,
         trademark, and other laws of foreign countries. Our trademarks and trade
         dress may not be used in connection with any product or service without
-        the prior written consent of CodeRev.app.
+        the prior written consent of CodeCrucible.
       </p>
 
       <h4>Copyright Policy</h4>

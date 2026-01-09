@@ -5,7 +5,7 @@ import { Dark } from "quasar";
 export const defaultProfile: Profile = {
   uid: "default",
   name: "default",
-  email: "default@coderev.app",
+  email: "default@CodeCrucible",
   createdAtUtc: "",
   createdBy: {
     uid: "default",
@@ -116,7 +116,7 @@ export const useAppStore = defineStore("appStore", () => {
           userProfile = {
             uid: authUser.uid,
             name: name,
-            email: authUser.email ?? `user.${authUser.uid}@coderev.app`,
+            email: authUser.email ?? `user.${authUser.uid}@CodeCrucible`,
             createdAtUtc: dayjs().utc().toISOString(),
             createdBy: {
               uid: authUser.uid,

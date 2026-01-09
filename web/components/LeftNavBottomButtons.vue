@@ -29,7 +29,7 @@
     <QItem
       v-bind="leftMenuProps"
       @click="
-        navigateTo('https://github.com/CharlieDigital/coderev/issues', {
+        navigateTo('https://github.com/CharlieDigital/CodeCrucible/issues', {
           external: true,
           open: {
             target: '_blank',

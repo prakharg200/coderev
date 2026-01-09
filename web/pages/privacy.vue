@@ -7,17 +7,17 @@
 
       <h4>Introduction</h4>
 
-      <p>Welcome to CodeRev.app (“Company”, “we”, “our”, “us”)!</p>
+      <p>Welcome to CodeCrucible (“Company”, “we”, “our”, “us”)!</p>
 
       <p>
         These Terms of Service (“Terms”, “Terms of Service”) govern your use of our web
-        pages located at https://coderev.app operated by Charles Chen.
+        pages located at https://CodeCrucible operated by Charles Chen.
       </p>
 
       <p>
         Our Privacy Policy also governs your use of our Service and explains how we
         collect, safeguard and disclose information that results from your use of our web
-        pages. Please read it here https://coderev.app/privacy.
+        pages. Please read it here https://CodeCrucible/privacy.
       </p>
 
       <p>
@@ -37,7 +37,7 @@
 
       <h4>Definitions</h4>
 
-      <p>SERVICE means the https://coderev.app website operated by CodeRev.app.</p>
+      <p>SERVICE means the https://CodeCrucible website operated by CodeCrucible.</p>
 
       <p>
         PERSONAL DATA means data about a living individual who can be identified from
@@ -223,7 +223,7 @@
       </p>
 
       <p>
-        CodeRev.app will take all the steps reasonably necessary to ensure that your data
+        CodeCrucible will take all the steps reasonably necessary to ensure that your data
         is treated securely and in accordance with this Privacy Policy and no transfer of
         your Personal Data will take place to an organization or a country unless there
         are adequate controls in place including the security of your data and other

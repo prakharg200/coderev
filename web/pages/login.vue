@@ -126,7 +126,7 @@ const userPassword = ref("");
 const errorMessage = ref("");
 
 useHeadSafe({
-  title: "CodeRev.app | Login",
+  title: "CodeCrucible | Login",
 });
 
 onBeforeMount(async () => {
@@ -149,7 +149,7 @@ const invalidInputs = computed(
 );
 
 function generateEmail() {
-  const generated = `${nanoid(12).toLowerCase()}@coderev.app`;
+  const generated = `${nanoid(12).toLowerCase()}@CodeCrucible`;
   userEmail.value = generated;
   copy(generated);
 

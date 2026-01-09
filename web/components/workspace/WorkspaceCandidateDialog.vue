@@ -131,7 +131,7 @@
         </QInput>
 
         <p class="q-mt-md">
-          Create a pre-generated account for the candidate (anonymous to CodeRev) .
+          Create a pre-generated account for the candidate (anonymous to CodeCrucible) .
         </p>
 
         <ul>
@@ -155,7 +155,7 @@
         <QIcon :name="tabInfoCircle" size="md" style="vertical-align: top" />
       </template>
 
-      <strong>CodeRev does not automatically send emails</strong>
+      <strong>CodeCrucible does not automatically send emails</strong>
       (for security and anti-spam reasons). After creating the workspace, copy the
       candidate workspace URL and send it to them in an email or chat message.
     </QBanner>
@@ -202,7 +202,7 @@ watch (visible, (showing) => {
   if (showing) {
     const candidateId = nanoid(16)
     candidateWorkspaceId.value = candidateId
-    generatedEmail.value = `c_${candidateId.toLowerCase()}@coderev.app`
+    generatedEmail.value = `c_${candidateId.toLowerCase()}@CodeCrucible`
     generatedPassword.value = `${nanoid(4)}-${nanoid(4)}-${nanoid(4)}`.toLowerCase()
     copiedGenerated.value = false
   }

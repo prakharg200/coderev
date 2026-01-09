@@ -19,7 +19,7 @@
           class="text-h5 text-weight-medium cursor-pointer"
           @click="navigateTo('/')"
         >
-          CodeRev.app
+          CodeCrucible
         </QToolbarTitle>
 
         <QBtn
@@ -29,58 +29,10 @@
           dense
           flat
         />
-
-        <QBtn
-          title="GitHub"
-          class="q-ml-sm"
-          :icon="tabBrandGithub"
-          @click="
-            navigateTo('https://github.com/CharlieDigital/coderev', {
-              external: true,
-              open: { target: '_blank' },
-            })
-          "
-          dense
-          flat
-        />
-
-        <!--
-        <QBtn
-          v-if="!$route.fullPath.includes('login')"
-          title="Login"
-          color="brand"
-          class="gt-sm q-ml-sm"
-          label="Login"
-          size="lg"
-          :icon="tabLogin"
-          to="/login"
-          unelevated
-          no-caps
-        />
-        <QBtn
-          v-if="!$route.fullPath.includes('login')"
-          title="Login"
-          color="brand"
-          class="q-ml-sm lt-md"
-          :icon="tabLogin"
-          to="/login"
-          unelevated
-          no-caps
-        />
-        -->
       </QToolbar>
 
       <QTabs v-model="tab" class="col-12" inline-label>
         <QRouteTab label="Home" name="home" class="rounded-borders" no-caps to="/" />
-        <QRouteTab
-          label="Blog"
-          name="blog"
-          class="rounded-borders"
-          no-caps
-          to="/blog"
-          exact
-        />
-        <QTab v-if="isPost" label="Post" name="post" class="rounded-borders" no-caps />
         <QRouteTab
           label="Login"
           name="login"
@@ -100,72 +52,22 @@
     </QPageContainer>
 
     <QFooter
-      class="text-center q-py-sm"
+      class="text-center q-py-md"
       :height-hint="53"
-      :class="[dark ? 'bg-grey-19' : 'bg-white']"
+      :class="[dark ? 'bg-grey-10' : 'bg-grey-1']"
       reveal
       bordered
     >
-      <QChip
-        size="md"
-        :color="dark ? 'grey-8' : undefined"
-        @click="
-          navigateTo('https://chrlschn.dev', {
-            external: true,
-            open: { target: '_blank' },
-          })
-        "
-        clickable
-      >
-        <QAvatar size="sm">
-          <img src="/chrlschn.jpg" title="Charles Chen" alt="Charles Chen" />
-        </QAvatar>
-        Charles Chen
-      </QChip>
-
-      <QChip
-        size="md"
-        :color="dark ? 'grey-8' : undefined"
-        @click="
-          navigateTo('https://bsky.app/profile/chrlschn.bsky.social', {
-            external: true,
-            open: { target: '_blank' },
-          })
-        "
-        clickable
-      >
-        <QAvatar class="bg-accent" text-color="white" font-size="0.9em" size="xs">
-          <QIcon :name="tabButterfly" />
-        </QAvatar>
-        chrlschn
-      </QChip>
-
-      <QChip
-        size="md"
-        :color="dark ? 'grey-8' : undefined"
-        @click="
-          navigateTo('https://mastodon.social/@chrlschn', {
-            external: true,
-            open: { target: '_blank' },
-          })
-        "
-        clickable
-      >
-        <QAvatar class="bg-accent" text-color="white" font-size="0.9em" size="xs">
-          <QIcon :name="tabBrandMastodon" />
-        </QAvatar>
-        chrlschn
-      </QChip>
+      <div class="text-caption text-grey">
+        © {{ new Date().getFullYear() }} CodeCrucible. All rights reserved.
+      </div>
     </QFooter>
   </QLayout>
 </template>
 
 <script setup lang="ts">
 import { navigateTo } from "nuxt/app";
-import { tabBrandGithub } from "quasar-extras-svg-icons/tabler-icons";
 import {
-  tabBrandMastodon,
-  tabButterfly,
   tabLogin2,
   tabMoon,
   tabSun,
@@ -175,11 +77,9 @@ const $q = useQuasar();
 
 const $route = useRoute();
 
-const tab = ref<"home" | "blog" | "post" | "login">("home");
+const tab = ref<"home" | "login">("home");
 
 const dark = computed(() => $q.dark.isActive);
-
-const isPost = computed(() => $route.path.startsWith("/blog/"));
 
 useHead({
   htmlAttrs: {
@@ -200,16 +100,6 @@ useHead({
     },
   ],
 });
-
-watch(
-  $route,
-  (route) => {
-    if (isPost.value) {
-      tab.value = "post";
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped>

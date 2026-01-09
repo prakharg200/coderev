@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   site: {
-    url: "coderev.app"
+    url: "CodeCrucible"
   },
   compatibilityDate: '2024-11-01',
   app: {

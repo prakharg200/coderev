@@ -32,13 +32,13 @@
     <QCheckbox
       v-model="receiveEmails"
       color="accent"
-      label="It's OK to occasionally notify me via email with the latest updates for CodeRev.app."
+      label="It's OK to occasionally notify me via email with the latest updates for CodeCrucible."
     />
 
     <QCheckbox
       v-model="receiveFeedbackRequests"
       color="accent"
-      label="It's OK to occasionally contact me via email for my feedback for CodeRev.app."
+      label="It's OK to occasionally contact me via email for my feedback for CodeCrucible."
       class="q-mt-md"
     />
 

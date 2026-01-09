@@ -135,21 +135,6 @@
                 dense
                 flat
               />
-              <QBtn
-                size="md"
-                class="q-mb-md"
-                :icon="tabBrandGithub"
-                @click="
-                  navigateTo('https://github.com/CharlieDigital/coderev/issues', {
-                    external: true,
-                    open: {
-                      target: '_blank',
-                    },
-                  })
-                "
-                dense
-                flat
-              />
             </div>
           </div>
         </template>
@@ -161,7 +146,7 @@
               <QIcon :name="tabHomeUp" />
             </QItemSection>
             <QItemSection>
-              <QItemLabel class="text-h5 text-weight-bold">CodeRev.app</QItemLabel>
+            <QItemLabel class="text-h5 text-weight-bold">CodeCrucible</QItemLabel>
             </QItemSection>
           </QItem>
 
@@ -344,7 +329,6 @@ import {
   tabHomeUp,
   tabMoon,
   tabSun,
-  tabBrandGithub,
   tabArrowBarToRight,
   tabInfoSquareRounded,
   tabUsers,
@@ -395,7 +379,7 @@ const workspaceName = computed(() => workspace.value.name);
 
 useHeadSafe({
   title: workspaceName,
-  titleTemplate: (title) => `CodeRev.app | ${title}`,
+  titleTemplate: (title) => `CodeCrucible | ${title}`,
 });
 
 const sources = computed(() => {

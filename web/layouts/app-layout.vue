@@ -18,7 +18,7 @@
           class="text-h5 text-weight-medium cursor-pointer"
           @click="navigateTo('/')"
         >
-          CodeRev.app
+          CodeCrucible
         </QToolbarTitle>
 
         <QBtn
@@ -51,28 +51,6 @@
                 <QItemSection> Preferences </QItemSection>
               </QItem>
 
-              <QItem @click="sendFeedback" clickable>
-                <QItemSection avatar>
-                  <QIcon :name="tabBrandGithub" />
-                </QItemSection>
-                <QItemSection> Feedback </QItemSection>
-              </QItem>
-
-              <QItem
-                @click="
-                  navigateTo('https://mastodon.social/@chrlschn', {
-                    external: true,
-                    open: { target: '_blank' },
-                  })
-                "
-                clickable
-              >
-                <QItemSection avatar>
-                  <QIcon :name="tabBrandMastodon" />
-                </QItemSection>
-                <QItemSection> @chrlschn </QItemSection>
-              </QItem>
-
               <QItem @click="logout" clickable>
                 <QItemSection avatar>
                   <QIcon :name="tabLogout" />
@@ -101,13 +79,11 @@
 <script setup lang="ts">
 import { navigateTo } from "nuxt/app";
 import {
-  tabBrandMastodon,
   tabMenu,
   tabSettings2,
   tabUser,
 } from "quasar-extras-svg-icons/tabler-icons";
 import {
-  tabBrandGithub,
   tabLogout,
   tabMoon,
   tabSun,
@@ -121,18 +97,6 @@ const { profile, showLeftDrawer, showPreferencesDialog } = storeToRefs(useAppSto
 
 async function logout() {
   await firebaseConnector.logout();
-}
-
-/**
- * Opens a mail to link.
- */
-async function sendFeedback() {
-  await navigateTo("https://github.com/CharlieDigital/coderev/issues", {
-    external: true,
-    open: {
-      target: "_blank",
-    },
-  });
 }
 </script>
 

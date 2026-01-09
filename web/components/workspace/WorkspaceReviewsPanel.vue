@@ -76,7 +76,7 @@
                   <QIcon
                     color="grey-6"
                     :name="
-                      c.email.trim().toLowerCase().endsWith('coderev.app')
+                      c.email.trim().toLowerCase().endsWith('CodeCrucible')
                         ? tabShieldOff
                         : tabShieldCheck
                     "
@@ -140,7 +140,7 @@
               feedback and reviews.
             </p>
             <p>
-              <strong>CodeRev does not automatically send emails</strong>
+              <strong>CodeCrucible does not automatically send emails</strong>
               (for security and anti-spam reasons). After creating the workspace, copy the
               candidate workspace URL and send it to them in an email or chat message.
             </p>
