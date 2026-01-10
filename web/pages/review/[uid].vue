@@ -73,7 +73,7 @@
 
         <QList class="q-gutter-md q-px-sm q-pt-md col">
           <QItem v-bind="leftMenuProps" @click="mini = true" clickable>
-            <QItemSection class="text-h5 text-bold"> CodeRev.app </QItemSection>
+            <QItemSection class="text-h5 text-bold"> CodeCrucible </QItemSection>
             <QItemSection side>
               <QIcon :name="tabArrowLeft" />
             </QItemSection>
@@ -156,7 +156,7 @@ const workspaceName = computed(() => candidate.value.workspaceName);
 
 useHeadSafe({
   title: workspaceName,
-  titleTemplate: (title) => `CodeRev.app | ${title}`,
+  titleTemplate: (title) => `CodeCrucible | ${title}`,
 });
 
 const showLeftDrawer = ref(true);

@@ -47,6 +47,8 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
     if (workspace.value.uid !== defaultWorkspace.uid) {
       firebaseSubscriptions
         .unsubscribe(`candidates.${workspace.value.uid}`)
+      firebaseSubscriptions
+        .unsubscribe(`workspace.${workspace.value.uid}`)
     }
 
     console.log(`Ensuring workspace: ${uid}`)
@@ -56,6 +58,8 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
 
       if (foundWorkspace) {
         workspace.value = foundWorkspace;
+        // Subscribe to workspace updates for real-time sync
+        subscribeToWorkspace(uid);
         return;
       }
     }
@@ -65,11 +69,45 @@ export const useWorkspaceStore = defineStore("useWorkspaceStore", () => {
 
       if (foundWorkspace) {
         workspace.value = foundWorkspace;
+        // Subscribe to workspace updates for real-time sync
+        subscribeToWorkspace(uid);
       }
     } catch (e) {
       console.error(`An error occurred while loading the workspace: ${uid}`);
       console.error(e);
     }
+  }
+
+  /**
+   * Subscribes to real-time workspace updates.
+   * This enables features like problems to be updated in real-time across
+   * interviewer and candidate views.
+   * @param uid The UID of the workspace to subscribe to
+   */
+  function subscribeToWorkspace(uid: string) {
+    const subscriptionKey = `workspace.${uid}`
+
+    if (firebaseSubscriptions.hasSubscription(subscriptionKey)) {
+      return
+    }
+
+    console.log(`Subscribing to workspace updates: ${uid}`)
+
+    const workspaceSubscription = workspaceRepository.subscribeToDocument(
+      uid,
+      (updatedWorkspace) => {
+        if (updatedWorkspace && !skipNextUpdate) {
+          console.log('Workspace updated from server')
+          // Merge updates into current workspace state
+          findAndMerge(workspace.value, updatedWorkspace)
+        }
+        if (skipNextUpdate) {
+          skipNextUpdate = false
+        }
+      }
+    )
+
+    firebaseSubscriptions.register(subscriptionKey, workspaceSubscription)
   }
 
   /**

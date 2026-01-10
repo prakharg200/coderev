@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { nanoid } from '../utils/nanoid'
+import { firebaseConnector } from '../utils/data/FirebaseConnector'
 
 /**
  * Represents a single chat message
@@ -80,10 +81,9 @@ export const useChatStore = defineStore('chatStore', () => {
         history
       }
 
-      // Call Firebase function
-      const { getFunctions, httpsCallable } = await import('firebase/functions')
-      const functions = getFunctions()
-      const aiChatFn = httpsCallable(functions, 'aiChat')
+      // Call Firebase function using the connector's functions instance (connected to emulator)
+      const { httpsCallable } = await import('firebase/functions')
+      const aiChatFn = httpsCallable(firebaseConnector.fn, 'aiChat')
 
       const response = await aiChatFn(request)
       const data = response.data as { message: string; error?: string }
@@ -102,8 +102,21 @@ export const useChatStore = defineStore('chatStore', () => {
       messages.value.push(assistantMessage)
 
     } catch (e: any) {
-      error.value = e.message || 'Failed to get AI response'
+      // Extract meaningful error message from FirebaseError
+      let errorMessage = 'Failed to get AI response'
+
+      if (e.code === 'functions/internal') {
+        errorMessage = 'AI service error. Please check that the Firebase functions are running and GEMINI_API_KEY is configured in functions/.env'
+      } else if (e.code === 'functions/unavailable') {
+        errorMessage = 'AI service unavailable. Make sure Firebase emulators are running.'
+      } else if (e.message) {
+        errorMessage = e.message
+      }
+
+      error.value = errorMessage
       console.error('AI Chat error:', e)
+      console.error('Error code:', e.code)
+      console.error('Error details:', e.details)
     } finally {
       isLoading.value = false
     }

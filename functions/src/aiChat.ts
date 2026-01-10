@@ -113,15 +113,33 @@ export const aiChat = functions.https.onCall(
     async (
         request: functions.https.CallableRequest<AiChatRequest>
     ): Promise<AiChatResponse> => {
-        const data = request.data;
+        try {
+            console.log("=== AI Chat Function Called ===");
+            console.log("Request auth:", request.auth?.uid);
 
-        // Get API key from environment variable
-        const apiKey = process.env.GEMINI_API_KEY;
+            const data = request.data;
+            console.log("Request message:", data?.message?.substring(0, 50));
+            console.log("Has context:", !!data?.context);
+            console.log("History length:", data?.history?.length);
 
-        if (!apiKey) {
-            console.warn("Gemini API key not configured");
-            return {
-                message: `I'm an AI assistant ready to help with code review, but I'm not currently configured.
+            // Validate request data
+            if (!data || !data.message) {
+                console.error("Invalid request: missing message");
+                return {
+                    message: "Invalid request: message is required",
+                    error: "Invalid request"
+                };
+            }
+
+            // Get API key from environment variable
+            const apiKey = process.env.GEMINI_API_KEY;
+            console.log("API Key available:", !!apiKey);
+            console.log("API Key length:", apiKey?.length);
+
+            if (!apiKey) {
+                console.warn("Gemini API key not configured");
+                return {
+                    message: `I'm an AI assistant ready to help with code review, but I'm not currently configured.
 
 **To enable AI responses:**
 1. Set the \`GEMINI_API_KEY\` environment variable in \`functions/.env\`
@@ -130,11 +148,11 @@ export const aiChat = functions.https.onCall(
 For now, I'll acknowledge your question: "${data.message.substring(0, 50)}..."
 
 ${data.context ? `You're looking at code from **${data.context.fileName}** (lines ${data.context.lineRange[0]}-${data.context.lineRange[1]}).` : ""}`,
-            };
-        }
+                };
+            }
 
-        // Build the system instruction
-        let systemInstruction = `You are a helpful code review assistant. The user is reviewing code and may ask questions about it.
+            // Build the system instruction
+            let systemInstruction = `You are a helpful code review assistant. The user is reviewing code and may ask questions about it.
 
 Provide concise, helpful responses. Focus on code review aspects like:
 - Potential bugs or issues
@@ -144,37 +162,42 @@ Provide concise, helpful responses. Focus on code review aspects like:
 
 Keep responses focused and practical.`;
 
-        // Add code context if provided
-        if (data.context) {
-            systemInstruction += `
+            // Add code context if provided
+            if (data.context) {
+                systemInstruction += `
 
 Current file: ${data.context.fileName}
 Selected code (lines ${data.context.lineRange[0]}-${data.context.lineRange[1]}):
 \`\`\`
 ${data.context.code}
 \`\`\``;
-        }
+            }
 
-        // Build contents array for Gemini
-        const contents = [
-            ...data.history.slice(-6).map((m) => ({
-                role: m.role === "assistant" ? "model" : "user",
-                parts: [{ text: m.content }],
-            })),
-            { role: "user", parts: [{ text: data.message }] },
-        ];
+            // Build contents array for Gemini
+            const history = data.history || [];
+            const contents = [
+                ...history.slice(-6).map((m) => ({
+                    role: m.role === "assistant" ? "model" : "user",
+                    parts: [{ text: m.content }],
+                })),
+                { role: "user", parts: [{ text: data.message }] },
+            ];
 
-        // Call Gemini with retry logic
-        const result = await callGeminiWithRetry(apiKey, contents, systemInstruction);
+            console.log("Calling Gemini API...");
 
-        if (result.success && result.message) {
-            return { message: result.message };
-        }
+            // Call Gemini with retry logic
+            const result = await callGeminiWithRetry(apiKey, contents, systemInstruction);
 
-        // Handle rate limiting specifically
-        if (result.error === "rate_limited") {
-            return {
-                message: `⏳ **Rate limit reached**
+            console.log("Gemini API result:", result.success ? "success" : result.error);
+
+            if (result.success && result.message) {
+                return { message: result.message };
+            }
+
+            // Handle rate limiting specifically
+            if (result.error === "rate_limited") {
+                return {
+                    message: `⏳ **Rate limit reached**
 
 The Gemini API free tier has limited requests per minute. Please wait a moment and try again.
 
@@ -183,13 +206,27 @@ The Gemini API free tier has limited requests per minute. Please wait a moment a
 - The free tier allows ~10-15 requests per minute
 
 Your question was: "${data.message.substring(0, 50)}..."`,
-                error: "Rate limit exceeded - please wait and try again",
+                    error: "Rate limit exceeded - please wait and try again",
+                };
+            }
+
+            return {
+                message: "Sorry, I encountered an error processing your request. Please try again.",
+                error: result.error,
+            };
+        } catch (error: unknown) {
+            console.error("=== AI Chat Function Error ===");
+            console.error("Error:", error);
+            console.error("Error type:", typeof error);
+            if (error instanceof Error) {
+                console.error("Error message:", error.message);
+                console.error("Error stack:", error.stack);
+            }
+
+            return {
+                message: "An unexpected error occurred. Please check the server logs for details.",
+                error: error instanceof Error ? error.message : "Unknown error"
             };
         }
-
-        return {
-            message: "Sorry, I encountered an error processing your request. Please try again.",
-            error: result.error,
-        };
     }
 );

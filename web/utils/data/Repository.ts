@@ -21,7 +21,7 @@ import dayjs from "dayjs";
 /**
  * Type used to represent an entity update that allows for deletion
  */
-export type EntityUpdate<T extends Entity> ={ [P in keyof T]?: T[P] | undefined | FieldValue }
+export type EntityUpdate<T extends Entity> = { [P in keyof T]?: T[P] | undefined | FieldValue }
 
 /**
  * Replaces an entity in a collection with a new one that has been updated.
@@ -69,7 +69,7 @@ export function findAndMerge<T extends Entity>(target: T, source: T) {
     if (
       typeof (source as any)[key] === "object" &&
       JSON.stringify((target as any)[key]) ===
-        JSON.stringify((source as any)[key])
+      JSON.stringify((source as any)[key])
     ) {
       continue;
     }
@@ -211,6 +211,28 @@ export abstract class Repository<T extends Entity> {
     return onSnapshot(q, (snapshot) => {
       for (const docChange of snapshot.docChanges()) {
         handlers[docChange.type](docChange.doc.data() as T);
+      }
+    });
+  }
+
+  /**
+   * Creates a subscription to a single document to handle changes. This
+   * subscription should be registered with firebaseSubscriptions!
+   * @param uid The UID of the document to subscribe to
+   * @param handler The callback to invoke when the document changes
+   * @returns The unsubscribe function
+   */
+  public subscribeToDocument(
+    uid: string,
+    handler: (doc: T | undefined) => void
+  ): Unsubscribe {
+    const docRef = doc(this.db, this.collectionRoot, uid);
+
+    return onSnapshot(docRef, (snapshot) => {
+      if (snapshot.exists()) {
+        handler(snapshot.data() as T);
+      } else {
+        handler(undefined);
       }
     });
   }
